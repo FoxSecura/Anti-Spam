@@ -1,0 +1,72 @@
+{
+  "name": "@foxsecura/anti-spam",
+  "version": "0.1.0",
+  "description": "A modular TypeScript anti-spam toolkit for Discord bots.",
+  "license": "MIT",
+  "author": "FoxSecura",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./discordjs": {
+      "types": "./dist/adapters/discordjs/index.d.ts",
+      "import": "./dist/adapters/discordjs/index.js"
+    },
+    "./modules": {
+      "types": "./dist/modules/index.d.ts",
+      "import": "./dist/modules/index.js"
+    },
+    "./presets": {
+      "types": "./dist/presets/index.d.ts",
+      "import": "./dist/presets/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "check": "biome check . && tsc --noEmit",
+    "format": "biome format --write .",
+    "lint": "biome lint .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "prepublishOnly": "npm run check && npm test && npm run build"
+  },
+  "keywords": [
+    "discord",
+    "discord.js",
+    "anti-spam",
+    "moderation",
+    "security",
+    "typescript"
+  ],
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "peerDependencies": {
+    "discord.js": ">=14.15.0 <15"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.5.3",
+    "@types/node": "^24.0.14",
+    "discord.js": "^14.26.5",
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.4"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FoxSecura/Anti-Spam.git"
+  },
+  "bugs": {
+    "url": "https://github.com/FoxSecura/Anti-Spam/issues"
+  },
+  "homepage": "https://github.com/FoxSecura/Anti-Spam#readme",
+  "overrides": {
+    "undici": "6.27.0"
+  }
+}
