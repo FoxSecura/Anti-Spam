@@ -1,0 +1,30 @@
+name: Feature request
+description: Propose a new module or improvement
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What anti-spam problem should be solved?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Include thresholds, evidence, and expected public API.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+  - type: checkboxes
+    id: architecture
+    attributes:
+      label: Architecture
+      options:
+        - label: The proposal keeps detection separate from enforcement.
+          required: true
