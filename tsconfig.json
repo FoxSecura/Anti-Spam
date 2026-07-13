@@ -19,7 +19,6 @@
     "outDir": "dist",
     "rootDir": ".",
     "types": ["node", "vitest/globals"],
-    "baseUrl": ".",
     "paths": {
       "@foxsecura/anti-spam": ["./src/index.ts"],
       "@foxsecura/anti-spam/discordjs": ["./src/adapters/discordjs/index.ts"],
