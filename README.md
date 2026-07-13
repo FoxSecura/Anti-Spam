@@ -1,34 +1,75 @@
-# Anti-Spam
+<div align="center">
 
-[![CI](https://img.shields.io/github/actions/workflow/status/FoxSecura/Anti-Spam/ci.yml?branch=main&style=plastic&logo=githubactions&logoColor=white&label=CI)](https://github.com/FoxSecura/Anti-Spam/actions/workflows/ci.yml)
-[![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?style=plastic&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![discord.js](https://img.shields.io/badge/discord.js-v14-5865F2?style=plastic&logo=discord&logoColor=white)](https://discord.js.org/)
-[![Node.js](https://img.shields.io/badge/Node.js-%3E%3D20-339933?style=plastic&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
-[![Vitest](https://img.shields.io/badge/tests-Vitest-6E9F18?style=plastic&logo=vitest&logoColor=white)](https://vitest.dev/)
-[![Biome](https://img.shields.io/badge/code_style-Biome-60A5FA?style=plastic&logo=biome&logoColor=white)](https://biomejs.dev/)
-[![License](https://img.shields.io/badge/license-MIT-3DA639?style=plastic&logo=opensourceinitiative&logoColor=white)](LICENSE)
-[![Security](https://img.shields.io/badge/security-policy-181717?style=plastic&logo=githubsecuritylab&logoColor=white)](SECURITY.md)
+# FoxSecura Anti-Spam
 
-A modular TypeScript anti-spam toolkit for Discord bots. It provides independent detection modules, configurable presets, and an optional discord.js v14 adapter without forcing moderation actions, persistence, commands, or deployment choices on the consuming project.
+**Discord Security Modules · Message Protection**
 
-## Design goals
+[![CI](https://img.shields.io/github/actions/workflow/status/FoxSecura/Anti-Spam/ci.yml?branch=main&style=flat-square&logo=githubactions&logoColor=white&label=CI)](https://github.com/FoxSecura/Anti-Spam/actions/workflows/ci.yml)
+[![CodeQL](https://img.shields.io/github/actions/workflow/status/FoxSecura/Anti-Spam/codeql.yml?branch=main&style=flat-square&logo=github&logoColor=white&label=CodeQL)](https://github.com/FoxSecura/Anti-Spam/actions/workflows/codeql.yml)
+[![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![discord.js](https://img.shields.io/badge/discord.js-v14-5865F2?style=flat-square&logo=discord&logoColor=white)](https://discord.js.org/)
+[![Node.js](https://img.shields.io/badge/Node.js-20%2B-5FA04E?style=flat-square&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
+[![License](https://img.shields.io/badge/License-MIT-22C55E?style=flat-square)](LICENSE)
 
-- **Installable package:** integrate it into an existing bot instead of running a separate bot.
-- **Independent modules:** enable, disable, replace, or configure each protection separately.
-- **Framework-agnostic core:** feed normalized message events from any Discord library.
-- **Safe by default:** modules report incidents and recommended actions; they do not ban, timeout, or delete messages themselves.
-- **Reusable FoxSecura standard:** follows the same `core → modules → presets → adapters` architecture as Anti-Raid.
+</div>
+
+`@foxsecura/anti-spam` is the **message-protection category** of the FoxSecura Security Modules suite. It is an installable TypeScript package for existing Discord bots, not a standalone bot.
+
+It detects abusive message patterns and returns structured incidents. The consuming bot remains responsible for message deletion, warnings, timeouts, logging, persistence, permissions, and deployment.
+
+## FoxSecura security suite
+
+| Package | Security category | Responsibility |
+| --- | --- | --- |
+| [`@foxsecura/anti-raid`](https://github.com/FoxSecura/Anti-Raid) | Raid protection | Detect coordinated or abnormal member joins. |
+| [`@foxsecura/anti-spam`](https://github.com/FoxSecura/Anti-Spam) | Message protection | Detect abusive message patterns and repeated content. |
+| [`@foxsecura/anti-nuke`](https://github.com/FoxSecura/Anti-Nuke) | Guild integrity | Detect destructive administrative actions from audit-log events. |
+| [`@foxsecura/automod`](https://github.com/FoxSecura/Automod) | Native AutoMod | Configure and synchronize Discord server-side moderation rules. |
+
+Each repository owns one security category while following the same package structure and integration contract.
+
+## Category scope
+
+Anti-Spam processes normalized message events and correlates abusive content or activity patterns over configurable time windows.
+
+It does not analyze member-join raids, audit-log destruction, or configure Discord native AutoMod rules.
 
 ## Included modules
 
-| Module | Purpose |
+| Module | Detects |
 | --- | --- |
-| `message-burst` | Detects too many messages from one member in a short window. |
-| `duplicate-messages` | Detects repeated normalized content. |
-| `mention-spam` | Detects excessive user, role, and everyone mentions. |
-| `link-spam` | Detects excessive or repeatedly posted URLs. |
-| `emoji-spam` | Detects messages containing too many Unicode or custom emoji. |
-| `caps-spam` | Detects repeated messages with an excessive uppercase ratio. |
+| `message-burst` | Too many messages from one member in a short period. |
+| `duplicate-messages` | Repeated normalized message content. |
+| `mention-spam` | Excessive user, role, or everyone mentions. |
+| `link-spam` | Excessive or repeatedly posted URLs. |
+| `emoji-spam` | Too many Unicode or custom emoji in a message. |
+| `caps-spam` | Repeated messages with an excessive uppercase ratio. |
+
+Every module can be enabled, disabled, configured, replaced, or combined with project-specific modules.
+
+## Shared package contract
+
+- framework-independent core contracts;
+- independent and composable modules;
+- configurable default presets;
+- Discord.js v14 adapter;
+- explicit `start()` and `stop()` lifecycle;
+- structured, serializable incidents;
+- project-level ignore lists;
+- no required database, command framework, logger, or environment loader;
+- no automatic sanctions.
+
+## Architecture
+
+```text
+src/
+├── core/                 # Framework-independent contracts and orchestration
+├── modules/              # Independent modules for this security category
+├── presets/              # Ready-to-use module collections
+├── adapters/
+│   └── discordjs/        # Discord.js v14 integration
+└── index.ts              # Public package exports
+```
 
 ## Installation
 
@@ -36,9 +77,15 @@ A modular TypeScript anti-spam toolkit for Discord bots. It provides independent
 npm install @foxsecura/anti-spam discord.js
 ```
 
-Until the package is published, install it from a GitHub release, npm tarball, workspace, or Git dependency.
+Before npm publication:
 
-## Discord.js integration
+```bash
+npm install github:FoxSecura/Anti-Spam
+```
+
+## Quick start
+
+Enable the guild message and message-content intents required by your bot.
 
 ```ts
 import { Client, GatewayIntentBits } from "discord.js";
@@ -56,68 +103,57 @@ const client = new Client({
 const antiSpam = new DiscordJsAntiSpam(client, {
   modules: createDefaultAntiSpamPreset(),
   onIncident: async (incident) => {
-    await moderationService.handleSpamIncident(incident);
+    await securityBus.publish(incident);
   },
 });
 
 antiSpam.start();
+await client.login(process.env.DISCORD_TOKEN);
 ```
 
-Call `antiSpam.stop()` during shutdown or hot reload.
+Call `antiSpam.stop()` during shutdown, hot reload, or plugin unload.
 
-## Select individual modules
-
-```ts
-import {
-  createDuplicateMessageModule,
-  createLinkSpamModule,
-  createMessageBurstModule,
-} from "@foxsecura/anti-spam/modules";
-
-const modules = [
-  createMessageBurstModule({ threshold: 7, windowMs: 4_000 }),
-  createDuplicateMessageModule({ threshold: 3, windowMs: 12_000 }),
-  createLinkSpamModule({ repeatedLinkThreshold: 2 }),
-];
-```
-
-## Framework-agnostic core
+## Framework-independent usage
 
 ```ts
 import { AntiSpamEngine } from "@foxsecura/anti-spam";
+import { createDefaultAntiSpamPreset } from "@foxsecura/anti-spam/presets";
 
 const engine = new AntiSpamEngine({
-  modules,
-  onIncident: async (incident) => {
-    await securityEvents.publish(incident);
-  },
+  modules: createDefaultAntiSpamPreset(),
+  onIncident: (incident) => securityBus.publish(incident),
 });
 
-await engine.handle({
-  guildId: "guild-id",
-  channelId: "channel-id",
-  messageId: "message-id",
-  authorId: "member-id",
-  content: "hello",
-  createdAt: Date.now(),
-  isBot: false,
-  mentionCount: 0,
-  roleMentionCount: 0,
-  mentionsEveryone: false,
-  attachmentCount: 0,
-});
+await engine.handle(normalizedMessageEvent);
 ```
 
-## Consumer responsibilities
+Projects using another Discord library only need to map their message events to the public core contracts.
 
-The consuming project decides how to:
+## Public entry points
+
+| Entry point | Purpose |
+| --- | --- |
+| `@foxsecura/anti-spam` | Engine, contracts, modules, and presets. |
+| `@foxsecura/anti-spam/modules` | Individual message-protection modules. |
+| `@foxsecura/anti-spam/presets` | Ready-to-use module collections. |
+| `@foxsecura/anti-spam/discordjs` | Discord.js event mapping and lifecycle. |
+
+## Consuming bot responsibilities
+
+The consuming bot decides how to:
 
 - delete messages or preserve evidence;
 - warn, timeout, restrict, or escalate members;
-- store incidents and per-guild configuration;
-- exempt trusted roles, channels, bots, and webhooks;
-- expose commands or dashboard settings;
-- coordinate Anti-Spam with Anti-Raid and future FoxSecura packages.
+- store incidents and guild configuration;
+- exempt trusted roles, channels, bots, or webhooks;
+- coordinate Anti-Spam with Anti-Raid, Anti-Nuke, and Automod;
+- apply permissions, approval rules, and operational safeguards.
+
+## Safety model
+
+Anti-Spam only detects and reports. It does not automatically delete messages, warn members, apply timeouts, or change channel permissions.
+
+Recommended actions are advisory. The consuming bot must validate context and apply its own exemptions, escalation policy, cooldowns, and audit logging.
 
 ## Development
 
