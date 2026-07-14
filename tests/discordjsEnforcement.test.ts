@@ -1,7 +1,7 @@
 import type { Client } from "discord.js";
 import { describe, expect, it, vi } from "vitest";
-import type { AntiSpamIncident } from "../src/core/types.js";
 import { enforceAntiSpamIncident } from "../src/adapters/discordjs/enforcement.js";
+import type { AntiSpamIncident } from "../src/core/types.js";
 
 const incident: AntiSpamIncident = {
   id: "incident-1",
