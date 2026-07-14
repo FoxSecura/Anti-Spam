@@ -5,6 +5,7 @@ import { Client, GatewayIntentBits } from "discord.js";
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMembers,
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.MessageContent,
   ],
@@ -12,10 +13,22 @@ const client = new Client({
 
 const antiSpam = new DiscordJsAntiSpam(client, {
   modules: createDefaultAntiSpamPreset(),
-  onIncident: async (incident) => {
-    // Route incidents to your own moderation, logging, persistence, or dashboard layer.
-    console.warn(incident);
+  enforcement: {
+    enabled: true,
+    deleteMessages: true,
+    timeout: {
+      enabled: true,
+      durationMs: 10 * 60 * 1000,
+      minimumSeverity: "high",
+    },
+    warnMember: {
+      enabled: true,
+    },
+  },
+  onIncident: (incident) => {
+    console.warn(`[FoxSecura Anti-Spam] ${incident.summary}`);
   },
 });
 
 antiSpam.start();
+await client.login(process.env.DISCORD_TOKEN);
