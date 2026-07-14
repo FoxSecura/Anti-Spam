@@ -50,10 +50,7 @@ export interface DiscordJsAntiSpamEnforcementOptions {
     | ((result: DiscordJsAntiSpamEnforcementResult) => void | Promise<void>)
     | undefined;
   readonly onError?:
-    | ((
-        error: unknown,
-        context: DiscordJsAntiSpamEnforcementErrorContext,
-      ) => void | Promise<void>)
+    | ((error: unknown, context: DiscordJsAntiSpamEnforcementErrorContext) => void | Promise<void>)
     | undefined;
 }
 

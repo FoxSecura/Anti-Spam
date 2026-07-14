@@ -20,7 +20,10 @@ function hasMinimumSeverity(current: SpamSeverity, minimum: SpamSeverity): boole
   return severityOrder[current] >= severityOrder[minimum];
 }
 
-function reasonFor(incident: AntiSpamIncident, options: DiscordJsAntiSpamEnforcementOptions): string {
+function reasonFor(
+  incident: AntiSpamIncident,
+  options: DiscordJsAntiSpamEnforcementOptions,
+): string {
   const prefix = options.reasonPrefix ?? "FoxSecura Anti-Spam";
   return `${prefix}: ${incident.moduleId} (${incident.id})`.slice(0, 512);
 }
@@ -62,8 +65,12 @@ async function resolveMember(
   client: Client,
   incident: AntiSpamIncident,
 ): Promise<GuildMember | null> {
-  const guild = client.guilds.cache.get(incident.guildId) ?? (await client.guilds.fetch(incident.guildId));
-  return guild.members.cache.get(incident.authorId) ?? (await guild.members.fetch(incident.authorId).catch(() => null));
+  const guild =
+    client.guilds.cache.get(incident.guildId) ?? (await client.guilds.fetch(incident.guildId));
+  return (
+    guild.members.cache.get(incident.authorId) ??
+    (await guild.members.fetch(incident.authorId).catch(() => null))
+  );
 }
 
 function isProtectedMember(
@@ -123,7 +130,8 @@ export async function enforceAntiSpamIncident(
   }
 
   const results: DiscordJsAntiSpamEnforcementResult[] = [];
-  const guild = client.guilds.cache.get(incident.guildId) ?? (await client.guilds.fetch(incident.guildId));
+  const guild =
+    client.guilds.cache.get(incident.guildId) ?? (await client.guilds.fetch(incident.guildId));
   let member: GuildMember | null | undefined;
 
   for (const action of actions) {
