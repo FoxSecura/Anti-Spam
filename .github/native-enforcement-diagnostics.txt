@@ -2,35 +2,4 @@
 > @foxsecura/anti-spam@0.1.0 check
 > biome check . && tsc --noEmit
 
-tests/discordjsEnforcement.test.ts:1:1 assist/source/organizeImports  FIXABLE  ━━━━━━━━━━━━━━━━━━━━━
-
-  × Sort these imports.
-  
-  > 1 │ import type { Client } from "discord.js";
-      │ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  > 2 │ import { describe, expect, it, vi } from "vitest";
-  > 3 │ import type { AntiSpamIncident } from "../src/core/types.js";
-  > 4 │ import { enforceAntiSpamIncident } from "../src/adapters/discordjs/enforcement.js";
-      │ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    5 │ 
-    6 │ const incident: AntiSpamIncident = {
-  
-  i Safe fix: Organize imports and exports (Biome)
-  
-     1  1 │   import type { Client } from "discord.js";
-     2  2 │   import { describe, expect, it, vi } from "vitest";
-     3    │ - import·type·{·AntiSpamIncident·}·from·"../src/core/types.js";
-     4    │ - import·{·enforceAntiSpamIncident·}·from·"../src/adapters/discordjs/enforcement.js";
-        3 │ + import·{·enforceAntiSpamIncident·}·from·"../src/adapters/discordjs/enforcement.js";
-        4 │ + import·type·{·AntiSpamIncident·}·from·"../src/core/types.js";
-     5  5 │   
-     6  6 │   const incident: AntiSpamIncident = {
-  
-
-Checked 34 files in 25ms. No fixes applied.
-Found 1 error.
-check ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-  × Some errors were emitted while running checks.
-  
-
+Checked 34 files in 32ms. No fixes applied.
