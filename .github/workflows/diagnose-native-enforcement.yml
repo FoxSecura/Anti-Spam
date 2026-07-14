@@ -1,0 +1,27 @@
+name: Diagnose native enforcement branch
+
+on:
+  push:
+    branches: [agent/native-enforcement]
+
+permissions:
+  contents: write
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: agent/native-enforcement
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+      - run: npm install
+      - run: npm run check > .github/native-enforcement-diagnostics.txt 2>&1 || true
+      - run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/native-enforcement-diagnostics.txt
+          git diff --cached --quiet || git commit -m "chore: capture native enforcement diagnostics"
+          git push
