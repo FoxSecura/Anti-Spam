@@ -15,7 +15,7 @@
 
 `@foxsecura/anti-spam` is the **message-protection category** of the FoxSecura Security Modules suite. It is an installable TypeScript package for existing Discord bots, not a standalone bot.
 
-It detects abusive message patterns and returns structured incidents. The consuming bot remains responsible for message deletion, warnings, timeouts, logging, persistence, permissions, and deployment.
+It detects abusive message patterns and can apply first-party Discord.js responses directly. Enforcement remains opt-in, while the framework-independent core stays detection-only.
 
 ## FoxSecura security suite
 
@@ -56,8 +56,9 @@ Every module can be enabled, disabled, configured, replaced, or combined with pr
 - explicit `start()` and `stop()` lifecycle;
 - structured, serializable incidents;
 - project-level ignore lists;
-- no required database, command framework, logger, or environment loader;
-- no automatic sanctions.
+- no required database, command framework, logger, environment loader, or external policy service;
+- optional first-party Discord.js enforcement;
+- sanctions disabled until `enforcement.enabled` is explicitly set.
 
 ## Architecture
 
@@ -67,7 +68,7 @@ src/
 ├── modules/              # Independent modules for this security category
 ├── presets/              # Ready-to-use module collections
 ├── adapters/
-│   └── discordjs/        # Discord.js v14 integration
+│   └── discordjs/        # Discord.js v14 integration and enforcement
 └── index.ts              # Public package exports
 ```
 
@@ -85,7 +86,7 @@ npm install github:FoxSecura/Anti-Spam
 
 ## Quick start
 
-Enable the guild message and message-content intents required by your bot.
+Enable the guild-members, guild-messages, and message-content intents. Grant **Manage Messages** and **Moderate Members** to the bot.
 
 ```ts
 import { Client, GatewayIntentBits } from "discord.js";
@@ -95,6 +96,7 @@ import { createDefaultAntiSpamPreset } from "@foxsecura/anti-spam/presets";
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMembers,
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.MessageContent,
   ],
@@ -102,8 +104,23 @@ const client = new Client({
 
 const antiSpam = new DiscordJsAntiSpam(client, {
   modules: createDefaultAntiSpamPreset(),
-  onIncident: async (incident) => {
-    await securityBus.publish(incident);
+  enforcement: {
+    enabled: true,
+    deleteMessages: true,
+    timeout: {
+      enabled: true,
+      durationMs: 10 * 60 * 1000,
+      minimumSeverity: "high",
+    },
+    warnMember: {
+      enabled: true,
+    },
+    onAction: (result) => {
+      console.info("[FoxSecura Anti-Spam]", result);
+    },
+  },
+  onIncident: (incident) => {
+    console.warn(incident.summary);
   },
 });
 
@@ -113,6 +130,17 @@ await client.login(process.env.DISCORD_TOKEN);
 
 Call `antiSpam.stop()` during shutdown, hot reload, or plugin unload.
 
+## Native enforcement
+
+When `enforcement.enabled` is `true`, the Discord.js adapter follows each incident's recommended actions and can:
+
+- delete the current or recent messages referenced by the incident;
+- warn the member by direct message;
+- timeout high-severity members;
+- send an alert to a configured moderation channel.
+
+The adapter protects the guild owner, the bot itself, configured ignored roles, and members above the bot in Discord's role hierarchy. Use `dryRun: true` to inspect planned actions without mutating Discord.
+
 ## Framework-independent usage
 
 ```ts
@@ -121,7 +149,7 @@ import { createDefaultAntiSpamPreset } from "@foxsecura/anti-spam/presets";
 
 const engine = new AntiSpamEngine({
   modules: createDefaultAntiSpamPreset(),
-  onIncident: (incident) => securityBus.publish(incident),
+  onIncident: (incident) => console.warn(incident),
 });
 
 await engine.handle(normalizedMessageEvent);
@@ -140,20 +168,19 @@ Projects using another Discord library only need to map their message events to 
 
 ## Consuming bot responsibilities
 
-The consuming bot decides how to:
+The consuming bot still decides how to:
 
-- delete messages or preserve evidence;
-- warn, timeout, restrict, or escalate members;
-- store incidents and guild configuration;
-- exempt trusted roles, channels, bots, or webhooks;
+- configure thresholds, timeout duration, alert channels, and ignored roles;
+- store incidents and per-guild configuration;
 - coordinate Anti-Spam with Anti-Raid, Anti-Nuke, and Automod;
-- apply permissions, approval rules, and operational safeguards.
+- grant the Discord permissions required by the enabled actions;
+- keep operational logs and review failed or skipped actions.
 
 ## Safety model
 
-Anti-Spam only detects and reports. It does not automatically delete messages, warn members, apply timeouts, or change channel permissions.
+The framework-independent core never mutates Discord. The Discord.js adapter sanctions only when `enforcement.enabled` is explicitly enabled.
 
-Recommended actions are advisory. The consuming bot must validate context and apply its own exemptions, escalation policy, cooldowns, and audit logging.
+Destructive escalation is limited to the configured actions. The adapter checks ownership, ignored roles, role hierarchy, message deletability, and member moderatability before applying a response. Every result is exposed through `onAction`, and `dryRun` can validate a policy before deployment.
 
 ## Development
 
